@@ -13,6 +13,28 @@ export const downloadTemplate = () => {
   downloadAnchorNode.remove();
 };
 
+export const downloadQuestions = (questions: Question[], title: string) => {
+  const template: RawTemplate = {
+    title: title,
+    description: `导出时间: ${new Date().toLocaleDateString()}，共 ${questions.length} 题`,
+    questions: questions.map(q => ({
+      type: q.type,
+      question: q.question,
+      options: q.options,
+      answer: q.correctAnswers, // Format matches RawQuestion expectation (number[])
+      explanation: q.explanation
+    }))
+  };
+
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(template, null, 2));
+  const downloadAnchorNode = document.createElement('a');
+  downloadAnchorNode.setAttribute("href", dataStr);
+  downloadAnchorNode.setAttribute("download", `${title}.json`);
+  document.body.appendChild(downloadAnchorNode);
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
+};
+
 export const parseAndValidateJSON = async (file: File): Promise<{ title: string; questions: Question[] }> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

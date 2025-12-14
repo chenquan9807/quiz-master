@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Upload, FileJson, Download, AlertCircle, BookOpen, ChevronRight, PlayCircle } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Upload, FileJson, Download, AlertCircle, BookOpen, ChevronRight, PlayCircle, History, Trash2 } from 'lucide-react';
 import { downloadTemplate, parseAndValidateJSON } from '../utils/fileHelpers';
 import { EXAMPLE_TEMPLATE } from '../constants';
 import type { Question, RawTemplate } from '../types';
@@ -8,37 +8,44 @@ interface StartScreenProps {
   onQuizStart: (questions: Question[], title: string) => void;
 }
 
+const STORAGE_KEY = 'quiz_master_mistakes';
+
 const StartScreen: React.FC<StartScreenProps> = ({ onQuizStart }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [historyCount, setHistoryCount] = useState(0);
+
+  // Check local storage for history on mount
+  useEffect(() => {
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            const data = JSON.parse(stored);
+            setHistoryCount(Array.isArray(data) ? data.length : 0);
+        }
+    } catch (e) {
+        console.error("Failed to read history", e);
+    }
+  }, []);
 
   // Auto-load all pmp_*.json files
-  // Using multiple patterns to ensure compatibility with different project structures (src folder vs root)
   const presets = useMemo(() => {
     try {
       // @ts-ignore - Vite glob import
       const modules = import.meta.glob([
-        '../pmp_*.json',      // If components is in root/components
-        '../../public/pmp_*.json',   // If components is in src/components (Standard Vite)
-        '/pmp_*.json',        // Absolute from root
-        './pmp_*.json'        // Same directory
+        '../../public/pmp_*.json', 
+        '../pmp_*.json',      
+        '../../pmp_*.json',   
+        '/pmp_*.json',        
+        './pmp_*.json'        
       ], { eager: true });
       
-      console.log('Found quiz modules:', Object.keys(modules)); // Debug log
-
       const list = Object.entries(modules).map(([path, content]: [string, any]) => {
-        // Handle both ES modules (with default export) and direct JSON imports
         const data = (content.default || content) as RawTemplate;
-        
-        // Extract filename from path
         const filename = path.split('/').pop() || 'Unknown';
-        
-        // Extract section number for sorting (e.g., pmp_section_1.json -> 1)
         const match = filename.match(/section_(\d+)/);
         const order = match ? parseInt(match[1]) : 999;
-
-        // Determine display title
         const displayTitle = data.title || filename.replace('.json', '').replace(/_/g, ' ').replace('pmp', 'PMP');
 
         return {
@@ -52,13 +59,11 @@ const StartScreen: React.FC<StartScreenProps> = ({ onQuizStart }) => {
         };
       });
 
-      // Filter out duplicates based on filename (in case multiple glob patterns match the same file)
       const uniquePresets = Array.from(new Map(list.map(item => [item.filename, item])).values());
 
       return uniquePresets
         .filter(item => item.count > 0)
         .sort((a, b) => {
-            // Sort by section number first, then by filename
             if (a.order !== 999 && b.order !== 999) return a.order - b.order;
             if (a.order !== 999) return -1;
             if (b.order !== 999) return 1;
@@ -98,7 +103,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onQuizStart }) => {
 
   const processFile = async (file: File) => {
     if (!file.name.toLowerCase().endsWith('.json')) {
-      setError('请选择 JSON 格式的文件 (Please select a JSON file)');
+      setError('请选择 JSON 格式的文件');
       return;
     }
     setLoading(true);
@@ -114,18 +119,17 @@ const StartScreen: React.FC<StartScreenProps> = ({ onQuizStart }) => {
     }
   };
 
-  const handlePresetClick = (preset: any) => {
+  const handlePresetClick = (presetData: any, presetTitle: string) => {
     setLoading(true);
-    // Simulate async to show loading state briefly
     setTimeout(async () => {
         try {
-            const blob = new Blob([JSON.stringify(preset.data)], { type: 'application/json' });
-            const file = new File([blob], preset.filename, { type: 'application/json' });
+            const blob = new Blob([JSON.stringify(presetData)], { type: 'application/json' });
+            const file = new File([blob], "preset.json", { type: 'application/json' });
             
             const { questions, title } = await parseAndValidateJSON(file);
-            onQuizStart(questions, title);
+            onQuizStart(questions, presetTitle || title);
         } catch (err: any) {
-            setError('加载预置题库失败: ' + err.message);
+            setError('加载题库失败: ' + err.message);
             setLoading(false);
         }
     }, 50);
@@ -144,6 +148,27 @@ const StartScreen: React.FC<StartScreenProps> = ({ onQuizStart }) => {
             setLoading(false);
         }
     }, 50);
+  };
+
+  const handleLoadHistory = () => {
+      try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (!stored) return;
+          // History items are already parsed Question objects (with correctAnswers),
+          // not RawQuestion objects (with answer). We should skip parseAndValidateJSON.
+          const questions = JSON.parse(stored) as Question[];
+          onQuizStart(questions, "历史错题本 (History Mistakes)");
+      } catch (e) {
+          setError("加载历史错题失败");
+      }
+  };
+
+  const handleClearHistory = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (window.confirm("确定要清空所有历史错题记录吗？此操作无法撤销。")) {
+          localStorage.removeItem(STORAGE_KEY);
+          setHistoryCount(0);
+      }
   };
 
   return (
@@ -222,14 +247,51 @@ const StartScreen: React.FC<StartScreenProps> = ({ onQuizStart }) => {
         <div className="flex flex-col gap-4 h-full">
             <h2 className="text-lg font-bold text-slate-700 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-indigo-500" />
-                内置题库 ({presets.length})
+                内置题库
             </h2>
             <div className="flex-1 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col max-h-[500px]">
                 <div className="overflow-y-auto p-2 space-y-2 flex-1 custom-scrollbar">
+                    {/* Special History Item - Always visible */}
+                    <div 
+                        onClick={historyCount > 0 ? handleLoadHistory : undefined}
+                        className={`w-full text-left p-4 rounded-xl border transition-all group flex items-center justify-between mb-2 relative
+                            ${historyCount > 0 
+                                ? 'bg-orange-50 border-orange-200 hover:border-orange-300 cursor-pointer' 
+                                : 'bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed'}`}
+                    >
+                         <div className="flex-1 min-w-0 mr-4">
+                            <h3 className={`font-bold flex items-center gap-2 ${historyCount > 0 ? 'text-orange-800' : 'text-slate-500'}`}>
+                                <History className="w-4 h-4" />
+                                历史错题本 (My Mistakes)
+                            </h3>
+                            <p className={`text-xs mt-1 ${historyCount > 0 ? 'text-orange-600/70' : 'text-slate-400'}`}>
+                                {historyCount > 0 ? "自动收集的历史错题集合" : "暂无错题记录 (No records)"}
+                            </p>
+                            {historyCount > 0 && (
+                                <div className="flex items-center gap-2 mt-2">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                                        {historyCount} 题
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                        {historyCount > 0 && (
+                            <div className="flex flex-col items-end gap-2">
+                                <button 
+                                    onClick={handleClearHistory}
+                                    className="p-2 text-orange-300 hover:text-red-500 hover:bg-orange-100 rounded-lg transition-colors z-10"
+                                    title="清空记录"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
                     {presets.length > 0 ? presets.map((preset) => (
                         <button
                             key={preset.id}
-                            onClick={() => handlePresetClick(preset)}
+                            onClick={() => handlePresetClick(preset.data, preset.title)}
                             className="w-full text-left p-4 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all group flex items-center justify-between"
                         >
                             <div className="flex-1 min-w-0 mr-4">

@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
-import { Trophy, RefreshCcw, AlertTriangle, CheckCircle2, XCircle, ChevronLeft } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Trophy, RefreshCcw, AlertTriangle, CheckCircle2, XCircle, ChevronLeft, Download, Save } from 'lucide-react';
 import type { Question } from '../types';
+import { downloadQuestions } from '../utils/fileHelpers';
 
 interface ResultScreenProps {
   score: number;
@@ -9,6 +10,8 @@ interface ResultScreenProps {
   onRestart: () => void;
   onNewFile: () => void;
 }
+
+const STORAGE_KEY = 'quiz_master_mistakes';
 
 const ResultScreen: React.FC<ResultScreenProps> = ({ score, questions, userAnswers, onRestart, onNewFile }) => {
   const [showMistakes, setShowMistakes] = useState(false);
@@ -26,6 +29,41 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, questions, userAnswe
     });
   }, [questions, userAnswers]);
 
+  // Auto-save mistakes to localStorage
+  useEffect(() => {
+    if (wrongQuestions.length > 0) {
+        try {
+            const existingData = localStorage.getItem(STORAGE_KEY);
+            let historyQuestions: Question[] = existingData ? JSON.parse(existingData) : [];
+            
+            // Merge new wrong questions, avoiding duplicates based on question text
+            const newMistakes = [...historyQuestions];
+            let addedCount = 0;
+
+            wrongQuestions.forEach(wq => {
+                const exists = newMistakes.some(eq => eq.question === wq.question);
+                if (!exists) {
+                    newMistakes.unshift(wq); // Add to top
+                    addedCount++;
+                }
+            });
+
+            if (addedCount > 0) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(newMistakes));
+                console.log(`Saved ${addedCount} new mistakes to history.`);
+            }
+        } catch (e) {
+            console.error("Failed to save mistakes to local storage", e);
+        }
+    }
+  }, [wrongQuestions]);
+
+  const handleExportMistakes = () => {
+    if (wrongQuestions.length === 0) return;
+    const dateStr = new Date().toISOString().split('T')[0];
+    downloadQuestions(wrongQuestions, `错题集_${dateStr}`);
+  };
+
   let gradeColor = "text-indigo-600";
   let message = "Excellent!";
   if (percentage < 60) {
@@ -40,16 +78,25 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, questions, userAnswe
   if (showMistakes) {
     return (
       <div className="flex flex-col w-full max-w-3xl mx-auto h-[100dvh] bg-slate-50">
-        <div className="sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-4 flex items-center gap-3 shadow-sm">
-             <button 
-                onClick={() => setShowMistakes(false)}
-                className="p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors"
+        <div className="sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-4 flex items-center justify-between shadow-sm">
+             <div className="flex items-center gap-3">
+                <button 
+                    onClick={() => setShowMistakes(false)}
+                    className="p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors"
+                >
+                    <ChevronLeft className="w-6 h-6" />
+                </button>
+                <h2 className="text-lg font-bold text-slate-800">
+                    错题记录 ({wrongQuestions.length})
+                </h2>
+             </div>
+             <button
+                onClick={handleExportMistakes}
+                className="text-indigo-600 p-2 hover:bg-indigo-50 rounded-full"
+                title="导出错题"
              >
-                <ChevronLeft className="w-6 h-6" />
+                 <Download className="w-5 h-5" />
              </button>
-             <h2 className="text-lg font-bold text-slate-800">
-                错题记录 ({wrongQuestions.length})
-             </h2>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
@@ -132,15 +179,37 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, questions, userAnswe
            </div>
 
            <div className="space-y-3">
-               {wrongQuestions.length > 0 && (
-                   <button 
-                    onClick={() => setShowMistakes(true)}
-                    className="w-full py-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mb-2"
-                   >
-                       <AlertTriangle className="w-5 h-5" />
-                       查看错题 ({wrongQuestions.length})
-                   </button>
+               {wrongQuestions.length > 0 ? (
+                   <>
+                       <button 
+                        onClick={() => setShowMistakes(true)}
+                        className="w-full py-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                       >
+                           <AlertTriangle className="w-5 h-5" />
+                           查看错题 ({wrongQuestions.length})
+                       </button>
+                       <div className="flex gap-3">
+                           <button 
+                            onClick={handleExportMistakes}
+                            className="flex-1 py-3 bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                           >
+                               <Download className="w-4 h-4" />
+                               导出错题
+                           </button>
+                           <div className="flex items-center px-3 bg-green-50 text-green-700 text-xs rounded-xl border border-green-100">
+                               <Save className="w-3 h-3 mr-1" />
+                               已自动归档
+                           </div>
+                       </div>
+                   </>
+               ) : (
+                   <div className="w-full py-3 bg-green-50 text-green-700 border border-green-200 rounded-xl font-bold flex items-center justify-center gap-2 mb-2">
+                       <CheckCircle2 className="w-5 h-5" />
+                       全对！太棒了！
+                   </div>
                )}
+
+               <div className="h-4"></div>
 
                <button 
                 onClick={onRestart}
