@@ -83,7 +83,7 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ questions, onComplete, onExit }
            setCurrentIndex(prev => prev + 1);
            window.scrollTo(0,0);
         }
-      }, 700); // 700ms delay to show the green checkmark
+      }, 400); // 700ms delay to show the green checkmark
     }
   };
 
