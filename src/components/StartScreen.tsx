@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Upload, FileJson, Download, AlertCircle, BookOpen, ChevronRight, RefreshCw, PlayCircle } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Upload, FileJson, Download, AlertCircle, BookOpen, ChevronRight, PlayCircle } from 'lucide-react';
 import { downloadTemplate, parseAndValidateJSON } from '../utils/fileHelpers';
 import { EXAMPLE_TEMPLATE } from '../constants';
 import type { Question, RawTemplate } from '../types';
@@ -20,7 +20,6 @@ const StartScreen: React.FC<StartScreenProps> = ({ onQuizStart }) => {
       // @ts-ignore - Vite glob import
       const modules = import.meta.glob([
         '../pmp_*.json',      // If components is in root/components
-        '../../pmp_*.json',   // If components is in src/components (Standard Vite)
         '../../public/pmp_*.json',   // If components is in src/components (Standard Vite)
         '/pmp_*.json',        // Absolute from root
         './pmp_*.json'        // Same directory
