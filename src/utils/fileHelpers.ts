@@ -1,4 +1,4 @@
-import { Question, RawQuestion, RawTemplate } from '../types';
+import type { Question, RawQuestion, RawTemplate } from '../types';
 import { EXAMPLE_TEMPLATE } from '../constants';
 
 const generateId = () => Math.random().toString(36).substring(2, 9);

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, FileJson, Download, AlertCircle } from 'lucide-react';
 import { downloadTemplate, parseAndValidateJSON } from '../utils/fileHelpers';
-import { Question } from '../types';
+import type { Question } from '../types';
 
 interface StartScreenProps {
   onQuizStart: (questions: Question[], title: string) => void;

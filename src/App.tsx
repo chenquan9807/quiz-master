@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import StartScreen from './components/StartScreen';
 import QuizScreen from './components/QuizScreen';
 import ResultScreen from './components/ResultScreen';
-import { Question, Screen } from './types';
+import type { Question, Screen } from './types';
 
 const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>('start');

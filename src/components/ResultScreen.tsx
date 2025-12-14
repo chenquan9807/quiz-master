@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, RefreshCcw, CheckCircle, XCircle } from 'lucide-react';
+import { Trophy, RefreshCcw } from 'lucide-react';
 
 interface ResultScreenProps {
   score: number;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Question } from '../types';
+import type { Question } from '../types';
 import { CheckCircle2, XCircle, ArrowRight, ArrowLeft, RotateCcw, HelpCircle } from 'lucide-react';
 
 interface QuizScreenProps {
@@ -9,7 +9,7 @@ interface QuizScreenProps {
   onExit: () => void;
 }
 
-const QuizScreen: React.FC<QuizScreenProps> = ({ questions, title, onComplete, onExit }) => {
+const QuizScreen: React.FC<QuizScreenProps> = ({ questions, onComplete, onExit }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
