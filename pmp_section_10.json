@@ -1,0 +1,356 @@
+{
+  "title": "PMP 题库 - 第十部分：项目采购管理",
+  "description": "涵盖规划采购、招投标、合同类型、控制与结束采购 (1-50题)。",
+  "questions": [
+    {
+      "id": "1",
+      "type": "single",
+      "question": "自制或外购分析（Make-or-Buy Analysis）属于哪个过程?",
+      "options": ["规划采购管理", "实施采购", "控制采购", "结束采购"],
+      "answer": 0
+    },
+    {
+      "id": "2",
+      "type": "single",
+      "question": "下列哪种合同类型对买方的风险最小?",
+      "options": ["固定总价合同 (FFP)", "成本加固定费用合同 (CPFF)", "工料合同 (T&M)", "成本加激励费用合同 (CPIF)"],
+      "answer": 0
+    },
+    {
+      "id": "3",
+      "type": "single",
+      "question": "下列哪种合同类型对卖方的风险最小?",
+      "options": ["成本加固定费用合同 (CPFF)", "固定总价合同 (FFP)", "总价加激励费用合同 (FPIF)", "工料合同 (T&M)"],
+      "answer": 0
+    },
+    {
+      "id": "4",
+      "type": "single",
+      "question": "当工作范围很明确时，通常使用哪种合同?",
+      "options": ["固定总价合同", "成本补偿合同", "工料合同", "单价合同"],
+      "answer": 0
+    },
+    {
+      "id": "5",
+      "type": "single",
+      "question": "当工作范围不明确，且需要立即开始工作时，通常使用哪种合同?",
+      "options": ["工料合同 (T&M)", "固定总价合同", "总价加激励费用合同", "成本加奖励费用合同"],
+      "answer": 0
+    },
+    {
+      "id": "6",
+      "type": "single",
+      "question": "采购工作说明书（SOW）应该由谁编写?",
+      "options": ["买方", "卖方", "第三方", "律师"],
+      "answer": 0
+    },
+    {
+      "id": "7",
+      "type": "single",
+      "question": "在总价加激励费用合同（FPIF）中，总体假设点（PTA）是指__。",
+      "options": ["卖方开始承担所有成本超支的点", "买方开始承担所有成本超支的点", "合同结束的点", "开始盈利的点"],
+      "answer": 0
+    },
+    {
+      "id": "8",
+      "type": "single",
+      "question": "投标人会议的目的是__。",
+      "options": ["确保所有潜在卖方对采购要求有清楚且一致的理解", "选定卖方", "谈判合同价格", "发布招标公告"],
+      "answer": 0
+    },
+    {
+      "id": "9",
+      "type": "single",
+      "question": "加权系统（Weighting System）通常用于__。",
+      "options": ["选择卖方", "支付款项", "索赔管理", "合同收尾"],
+      "answer": 0
+    },
+    {
+      "id": "10",
+      "type": "single",
+      "question": "独立估算（Independent Estimates）用于__。",
+      "options": ["验证卖方报价的合理性", "确定预算", "计算利润", "审计合同"],
+      "answer": 0
+    },
+    {
+      "id": "11",
+      "type": "single",
+      "question": "合同变更控制系统是__的一部分。",
+      "options": ["控制采购", "规划采购", "实施采购", "结束采购"],
+      "answer": 0
+    },
+    {
+      "id": "12",
+      "type": "single",
+      "question": "索赔管理（Claims Administration）属于__。",
+      "options": ["控制采购", "规划采购", "实施采购", "结束采购"],
+      "answer": 0
+    },
+    {
+      "id": "13",
+      "type": "single",
+      "question": "采购审计的目的是__。",
+      "options": ["总结采购过程中的经验教训", "审计财务报表", "检查产品质量", "处罚供应商"],
+      "answer": 0
+    },
+    {
+      "id": "14",
+      "type": "single",
+      "question": "结束采购时，项目经理应该确保__。",
+      "options": ["所有可交付成果已验收，合同条款已履行", "所有款项已支付", "供应商已评价", "以上都是"],
+      "answer": 3
+    },
+    {
+      "id": "15",
+      "type": "single",
+      "question": "在成本加激励费用合同（CPIF）中，如果实际成本低于目标成本，节约的部分将__。",
+      "options": ["由买方和卖方按比例分享", "归买方所有", "归卖方所有", "上交国家"],
+      "answer": 0
+    },
+    {
+      "id": "16",
+      "type": "single",
+      "question": "RFI（信息邀请书）主要用于__。",
+      "options": ["收集关于供应商能力的信息", "征求报价", "征求建议方案", "邀请投标"],
+      "answer": 0
+    },
+    {
+      "id": "17",
+      "type": "single",
+      "question": "RFP（建议邀请书）主要用于__。",
+      "options": ["征求解决问题的方案", "征求具体价格", "征求信息", "确认合作意向"],
+      "answer": 0
+    },
+    {
+      "id": "18",
+      "type": "single",
+      "question": "RFQ（报价邀请书）主要用于__。",
+      "options": ["征求具体价格，通常用于标准产品", "征求方案", "征求信息", "征求合作"],
+      "answer": 0
+    },
+    {
+      "id": "19",
+      "type": "single",
+      "question": "单一来源采购（Sole Source）是指__。",
+      "options": ["只有一个供应商能提供所需产品", "只邀请一个供应商投标", "选择最便宜的供应商", "选择最好的供应商"],
+      "answer": 0
+    },
+    {
+      "id": "20",
+      "type": "single",
+      "question": "单方选择采购（Single Source）是指__。",
+      "options": ["尽管有多个供应商，但买方决定只向特定供应商采购", "只有一个供应商", "通过招标选择", "随机选择"],
+      "answer": 0
+    },
+    {
+      "id": "21",
+      "type": "single",
+      "question": "合同不仅是法律文件，也是__。",
+      "options": ["项目管理文件", "技术文件", "沟通文件", "以上都是"],
+      "answer": 0
+    },
+    {
+      "id": "22",
+      "type": "single",
+      "question": "ADR（替代争议解决方法）包括__。",
+      "options": ["谈判、调解、仲裁", "诉讼", "暴力解决", "忽略"],
+      "answer": 0
+    },
+    {
+      "id": "23",
+      "type": "single",
+      "question": "集中订约（Centralized Contracting）的优点是__。",
+      "options": ["易于标准化，获得规模经济", "反应速度快", "更了解项目需求", "灵活性高"],
+      "answer": 0
+    },
+    {
+      "id": "24",
+      "type": "single",
+      "question": "分散订约（Decentralized Contracting）的优点是__。",
+      "options": ["更能满足项目特定需求，反应快", "成本低", "标准化程度高", "专业性强"],
+      "answer": 0
+    },
+    {
+      "id": "25",
+      "type": "single",
+      "question": "如果合同中包含“不可抗力”条款，它是为了__。",
+      "options": ["免除双方在特定情况下的责任", "增加卖方责任", "增加买方责任", "取消合同"],
+      "answer": 0
+    },
+    {
+      "id": "26",
+      "type": "single",
+      "question": "合同收尾通常在__之前完成。",
+      "options": ["项目收尾", "项目执行", "项目规划", "项目启动"],
+      "answer": 0
+    },
+    {
+      "id": "27",
+      "type": "single",
+      "question": "在采购谈判中，项目经理的角色通常是__。",
+      "options": ["提供技术支持和澄清", "主谈人", "记录员", "观察员"],
+      "answer": 0
+    },
+    {
+      "id": "28",
+      "type": "single",
+      "question": "在谈判中，主谈人通常是__。",
+      "options": ["采购经理或合同管理员", "项目经理", "技术专家", "律师"],
+      "answer": 0
+    },
+    {
+      "id": "29",
+      "type": "single",
+      "question": "如果卖方违约，买方首先应该__。",
+      "options": ["查阅合同条款，发出正式通知", "起诉", "停止付款", "解除合同"],
+      "answer": 0
+    },
+    {
+      "id": "30",
+      "type": "single",
+      "question": "工料合同（T&M）通常设有__以防止成本无限增加。",
+      "options": ["最高限价 (Not-to-Exceed Limit)", "最低限价", "固定价格", "激励费用"],
+      "answer": 0
+    },
+    {
+      "id": "31",
+      "type": "single",
+      "question": "绩效审查（Performance Reviews）用于__。",
+      "options": ["审查卖方在成本、进度、质量方面的绩效", "审查项目团队绩效", "审查买方绩效", "审查市场行情"],
+      "answer": 0
+    },
+    {
+      "id": "32",
+      "type": "single",
+      "question": "检查（Inspections）和审计（Audits）在采购中用于__。",
+      "options": ["验证卖方的工作过程和可交付成果", "谈判", "选择卖方", "支付"],
+      "answer": 0
+    },
+    {
+      "id": "33",
+      "type": "single",
+      "question": "记录管理系统（Records Management System）用于__。",
+      "options": ["管理合同文件和通信记录", "管理员工档案", "管理财务记录", "管理库存"],
+      "answer": 0
+    },
+    {
+      "id": "34",
+      "type": "single",
+      "question": "如果项目需要保密，应该在采购文件中包含__。",
+      "options": ["保密协议 (NDA)", "SOW", "RFP", "评估标准"],
+      "answer": 0
+    },
+    {
+      "id": "35",
+      "type": "single",
+      "question": "筛选系统（Screening System）用于__。",
+      "options": ["建立最低要求，剔除不合格的卖方", "选择最佳卖方", "计算价格", "评估风险"],
+      "answer": 0
+    },
+    {
+      "id": "36",
+      "type": "single",
+      "question": "卖方建议书（Seller Proposals）是__的输入。",
+      "options": ["选择卖方", "规划采购", "控制采购", "结束采购"],
+      "answer": 0
+    },
+    {
+      "id": "37",
+      "type": "single",
+      "question": "资源日历（Resource Calendars）在采购中用于__。",
+      "options": ["确定资源何时可用", "安排会议", "计算工期", "确定假期"],
+      "answer": 0
+    },
+    {
+      "id": "38",
+      "type": "single",
+      "question": "合同变更请求必须通过__处理。",
+      "options": ["合同变更控制系统", "口头协议", "非正式邮件", "随意更改"],
+      "answer": 0
+    },
+    {
+      "id": "39",
+      "type": "single",
+      "question": "如果买方希望卖方分担风险并激励其节约成本，应选择__合同。",
+      "options": ["激励类 (Incentive)", "固定总价", "成本加固定费用", "工料"],
+      "answer": 0
+    },
+    {
+      "id": "40",
+      "type": "single",
+      "question": "CPIF合同：目标成本10万，目标费用1万，分担比例80/20。实际成本8万。卖方获得多少利润?",
+      "options": ["1.4万 (1万 + (10-8)*20%)", "1万", "1.2万", "0.8万"],
+      "answer": 0
+    },
+    {
+      "id": "41",
+      "type": "single",
+      "question": "CPIF合同：目标成本10万，目标费用1万，分担比例80/20。实际成本12万。卖方获得多少利润?",
+      "options": ["0.6万 (1万 + (10-12)*20%)", "1万", "0.8万", "0.4万"],
+      "answer": 0
+    },
+    {
+      "id": "42",
+      "type": "single",
+      "question": "FPIF合同：目标成本100万，目标利润10万，最高限价120万，分担70/30。实际成本130万。买方支付多少?",
+      "options": ["120万 (达到最高限价)", "130万", "140万", "110万"],
+      "answer": 0
+    },
+    {
+      "id": "43",
+      "type": "single",
+      "question": "在采购中，谈判的主要目标是__。",
+      "options": ["达成公平合理的协议，建立良好关系", "压低价格", "击败对手", "推卸责任"],
+      "answer": 0
+    },
+    {
+      "id": "44",
+      "type": "single",
+      "question": "建设-运营-移交（BOT）是一种__。",
+      "options": ["项目交付方式", "合同类型", "采购文件", "付款方式"],
+      "answer": 0
+    },
+    {
+      "id": "45",
+      "type": "single",
+      "question": "提前终止合同（Early Termination）是__。",
+      "options": ["一种特殊形式的合同收尾", "违约", "不可接受的", "无需记录的"],
+      "answer": 0
+    },
+    {
+      "id": "46",
+      "type": "single",
+      "question": "采购文件中的评估标准（Evaluation Criteria）用于__。",
+      "options": ["评价和评分卖方建议书", "编写SOW", "制定预算", "监控绩效"],
+      "answer": 0
+    },
+    {
+      "id": "47",
+      "type": "single",
+      "question": "自制或外购决策应考虑__。",
+      "options": ["直接成本和间接成本", "仅直接成本", "仅购买价格", "仅管理成本"],
+      "answer": 0
+    },
+    {
+      "id": "48",
+      "type": "single",
+      "question": "保修期通常在__开始。",
+      "options": ["产品验收及移交后", "合同签订时", "产品制造时", "付款时"],
+      "answer": 0
+    },
+    {
+      "id": "49",
+      "type": "single",
+      "question": "如果买方想要完全控制工作过程，不应使用__合同。",
+      "options": ["固定总价", "成本补偿", "工料", "劳务"],
+      "answer": 0
+    },
+    {
+      "id": "50",
+      "type": "single",
+      "question": "在国际采购中，还应考虑__。",
+      "options": ["汇率、文化、法律、物流", "仅汇率", "仅语言", "仅时差"],
+      "answer": 0
+    }
+  ]
+}
