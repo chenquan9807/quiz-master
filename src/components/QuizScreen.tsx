@@ -43,24 +43,6 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ questions, onComplete, onExit }
     }
   };
 
-  const handleSubmit = () => {
-    if (selectedIndices.length === 0) return;
-
-    const isCorrect = 
-      selectedIndices.length === currentQuestion.correctAnswers.length &&
-      selectedIndices.every(val => currentQuestion.correctAnswers.includes(val));
-
-    if (isCorrect && !userAnswers[currentQuestion.id]) {
-        setScore(s => s + 1);
-    }
-
-    setUserAnswers(prev => ({
-      ...prev,
-      [currentQuestion.id]: selectedIndices
-    }));
-    setIsSubmitted(true);
-  };
-
   const handleNext = () => {
     if (isLastQuestion) {
       onComplete(score, userAnswers);
@@ -68,6 +50,40 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ questions, onComplete, onExit }
       setCurrentIndex(prev => prev + 1);
       // Auto scroll to top on mobile
       window.scrollTo(0,0);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (selectedIndices.length === 0) return;
+
+    const isCorrect = 
+      selectedIndices.length === currentQuestion.correctAnswers.length &&
+      selectedIndices.every(val => currentQuestion.correctAnswers.includes(val));
+
+    let newScore = score;
+    if (isCorrect && !userAnswers[currentQuestion.id]) {
+        newScore = score + 1;
+        setScore(newScore);
+    }
+
+    const newUserAnswers = {
+      ...userAnswers,
+      [currentQuestion.id]: selectedIndices
+    };
+
+    setUserAnswers(newUserAnswers);
+    setIsSubmitted(true);
+
+    // Auto-advance if correct
+    if (isCorrect) {
+      setTimeout(() => {
+        if (isLastQuestion) {
+           onComplete(newScore, newUserAnswers);
+        } else {
+           setCurrentIndex(prev => prev + 1);
+           window.scrollTo(0,0);
+        }
+      }, 700); // 700ms delay to show the green checkmark
     }
   };
 

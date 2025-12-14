@@ -9,6 +9,7 @@ const App: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [quizTitle, setQuizTitle] = useState<string>('');
   const [finalScore, setFinalScore] = useState(0);
+  const [finalUserAnswers, setFinalUserAnswers] = useState<Record<string, number[]>>({});
 
   const handleStartQuiz = (loadedQuestions: Question[], title: string) => {
     setQuestions(loadedQuestions);
@@ -16,13 +17,15 @@ const App: React.FC = () => {
     setCurrentScreen('quiz');
   };
 
-  const handleComplete = (score: number) => {
+  const handleComplete = (score: number, userAnswers: Record<string, number[]>) => {
     setFinalScore(score);
+    setFinalUserAnswers(userAnswers);
     setCurrentScreen('result');
   };
 
   const handleRestart = () => {
     setFinalScore(0);
+    setFinalUserAnswers({});
     setCurrentScreen('quiz');
   };
 
@@ -30,6 +33,7 @@ const App: React.FC = () => {
     setQuestions([]);
     setQuizTitle('');
     setFinalScore(0);
+    setFinalUserAnswers({});
     setCurrentScreen('start');
   };
 
@@ -50,7 +54,8 @@ const App: React.FC = () => {
       {currentScreen === 'result' && (
         <ResultScreen 
           score={finalScore} 
-          total={questions.length} 
+          questions={questions}
+          userAnswers={finalUserAnswers}
           onRestart={handleRestart}
           onNewFile={handleNewFile}
         />
