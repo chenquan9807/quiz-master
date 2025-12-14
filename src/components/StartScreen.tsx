@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Upload, FileJson, Download, AlertCircle } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Upload, FileJson, Download, AlertCircle, BookOpen, ChevronRight, RefreshCw, PlayCircle } from 'lucide-react';
 import { downloadTemplate, parseAndValidateJSON } from '../utils/fileHelpers';
-import type { Question } from '../types';
+import { EXAMPLE_TEMPLATE } from '../constants';
+import type { Question, RawTemplate } from '../types';
 
 interface StartScreenProps {
   onQuizStart: (questions: Question[], title: string) => void;
@@ -11,6 +12,65 @@ const StartScreen: React.FC<StartScreenProps> = ({ onQuizStart }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Auto-load all pmp_*.json files
+  // Using multiple patterns to ensure compatibility with different project structures (src folder vs root)
+  const presets = useMemo(() => {
+    try {
+      // @ts-ignore - Vite glob import
+      const modules = import.meta.glob([
+        '../pmp_*.json',      // If components is in root/components
+        '../../pmp_*.json',   // If components is in src/components (Standard Vite)
+        '../../public/pmp_*.json',   // If components is in src/components (Standard Vite)
+        '/pmp_*.json',        // Absolute from root
+        './pmp_*.json'        // Same directory
+      ], { eager: true });
+      
+      console.log('Found quiz modules:', Object.keys(modules)); // Debug log
+
+      const list = Object.entries(modules).map(([path, content]: [string, any]) => {
+        // Handle both ES modules (with default export) and direct JSON imports
+        const data = (content.default || content) as RawTemplate;
+        
+        // Extract filename from path
+        const filename = path.split('/').pop() || 'Unknown';
+        
+        // Extract section number for sorting (e.g., pmp_section_1.json -> 1)
+        const match = filename.match(/section_(\d+)/);
+        const order = match ? parseInt(match[1]) : 999;
+
+        // Determine display title
+        const displayTitle = data.title || filename.replace('.json', '').replace(/_/g, ' ').replace('pmp', 'PMP');
+
+        return {
+          id: path,
+          filename,
+          title: displayTitle,
+          description: data.description || `包含 ${data.questions?.length || 0} 道题目`,
+          count: Array.isArray(data.questions) ? data.questions.length : 0,
+          data: data,
+          order
+        };
+      });
+
+      // Filter out duplicates based on filename (in case multiple glob patterns match the same file)
+      const uniquePresets = Array.from(new Map(list.map(item => [item.filename, item])).values());
+
+      return uniquePresets
+        .filter(item => item.count > 0)
+        .sort((a, b) => {
+            // Sort by section number first, then by filename
+            if (a.order !== 999 && b.order !== 999) return a.order - b.order;
+            if (a.order !== 999) return -1;
+            if (b.order !== 999) return 1;
+            return a.filename.localeCompare(b.filename);
+        });
+
+    } catch (e) {
+      console.error("Failed to load presets", e);
+      return [];
+    }
+  }, []);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -38,96 +98,178 @@ const StartScreen: React.FC<StartScreenProps> = ({ onQuizStart }) => {
   };
 
   const processFile = async (file: File) => {
-    // Basic check, though mobile file pickers handle mime types differently sometimes
     if (!file.name.toLowerCase().endsWith('.json')) {
       setError('请选择 JSON 格式的文件 (Please select a JSON file)');
       return;
     }
-
     setLoading(true);
     setError(null);
-
     try {
       const { questions, title } = await parseAndValidateJSON(file);
-      if (questions.length === 0) {
-        throw new Error("文件中没有找到题目 (No questions found in file)");
-      }
+      if (questions.length === 0) throw new Error("文件中没有找到题目");
       onQuizStart(questions, title);
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || '解析文件失败，请检查格式 (Failed to parse file)');
+      setError(err.message || '解析文件失败');
     } finally {
       setLoading(false);
     }
   };
 
+  const handlePresetClick = (preset: any) => {
+    setLoading(true);
+    // Simulate async to show loading state briefly
+    setTimeout(async () => {
+        try {
+            const blob = new Blob([JSON.stringify(preset.data)], { type: 'application/json' });
+            const file = new File([blob], preset.filename, { type: 'application/json' });
+            
+            const { questions, title } = await parseAndValidateJSON(file);
+            onQuizStart(questions, title);
+        } catch (err: any) {
+            setError('加载预置题库失败: ' + err.message);
+            setLoading(false);
+        }
+    }, 50);
+  };
+
+  const loadExampleQuiz = async () => {
+    setLoading(true);
+    setTimeout(async () => {
+        try {
+            const blob = new Blob([JSON.stringify(EXAMPLE_TEMPLATE)], { type: 'application/json' });
+            const file = new File([blob], "example_quiz.json", { type: 'application/json' });
+            const { questions, title } = await parseAndValidateJSON(file);
+            onQuizStart(questions, title);
+        } catch (err: any) {
+            setError('加载演示题库失败');
+            setLoading(false);
+        }
+    }, 50);
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center flex-1 px-4 py-8 animate-fade-in safe-p">
-      <div className="text-center mb-8 md:mb-12 mt-4">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-4">
+    <div className="flex flex-col items-center flex-1 w-full max-w-5xl mx-auto px-4 py-8 animate-fade-in safe-p">
+      <div className="text-center mb-8 md:mb-10 mt-4">
+        <h1 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-3">
           QuizMaster Pro
         </h1>
-        <p className="text-slate-500 text-base md:text-lg max-w-xs md:max-w-lg mx-auto">
-          PMP 备考神器<br/>
-          Import your question bank and start practicing.
+        <p className="text-slate-500 text-sm md:text-lg max-w-lg mx-auto">
+          PMP 专业备考与刷题工具
         </p>
       </div>
 
-      <div
-        className={`w-full max-w-xl p-8 md:p-10 border-2 border-dashed rounded-3xl transition-all duration-300 flex flex-col items-center justify-center cursor-pointer bg-white shadow-sm active:scale-95 touch-manipulation
-          ${isDragging 
-            ? 'border-indigo-500 bg-indigo-50 scale-102 shadow-xl' 
-            : 'border-slate-300 hover:border-indigo-400 hover:shadow-md'
-          }`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => document.getElementById('fileInput')?.click()}
-      >
-        <input
-          type="file"
-          id="fileInput"
-          className="hidden"
-          accept=".json"
-          onChange={handleFileSelect}
-        />
-        
-        <div className={`p-4 rounded-full mb-4 ${isDragging ? 'bg-indigo-200' : 'bg-slate-100'}`}>
-          {loading ? (
-             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
-          ) : (
-            <Upload className={`w-10 h-10 ${isDragging ? 'text-indigo-600' : 'text-slate-500'}`} />
-          )}
+      <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        {/* Left Column: Upload */}
+        <div className="flex flex-col gap-6">
+            <h2 className="text-lg font-bold text-slate-700 flex items-center gap-2">
+                <Upload className="w-5 h-5 text-indigo-500" />
+                导入新题库
+            </h2>
+            <div
+                className={`w-full p-8 border-2 border-dashed rounded-2xl transition-all duration-300 flex flex-col items-center justify-center cursor-pointer bg-white min-h-[200px]
+                ${isDragging 
+                    ? 'border-indigo-500 bg-indigo-50 scale-[1.01] shadow-xl' 
+                    : 'border-slate-300 hover:border-indigo-400 hover:bg-slate-50 hover:shadow-md'
+                }`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => document.getElementById('fileInput')?.click()}
+            >
+                <input
+                    type="file"
+                    id="fileInput"
+                    className="hidden"
+                    accept=".json"
+                    onChange={handleFileSelect}
+                />
+                
+                {loading ? (
+                    <div className="flex flex-col items-center">
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mb-4"></div>
+                        <p className="text-slate-500 font-medium">处理中...</p>
+                    </div>
+                ) : (
+                    <>
+                        <div className={`p-3 rounded-full mb-4 ${isDragging ? 'bg-indigo-200' : 'bg-slate-100'}`}>
+                            <Upload className={`w-8 h-8 ${isDragging ? 'text-indigo-600' : 'text-slate-400'}`} />
+                        </div>
+                        <p className="text-slate-600 font-medium mb-1">点击或拖拽上传 .json 文件</p>
+                        <p className="text-slate-400 text-xs">支持自定义题库格式</p>
+                    </>
+                )}
+            </div>
+
+            {error && (
+                <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-start gap-3 text-sm animate-bounce-in">
+                    <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                    <p>{error}</p>
+                </div>
+            )}
+             
+             <div className="flex justify-center">
+                <button 
+                onClick={downloadTemplate}
+                className="flex items-center gap-2 text-slate-400 hover:text-indigo-600 transition-colors px-4 py-2 rounded-lg text-xs md:text-sm"
+                >
+                    <FileJson className="w-4 h-4" />
+                    下载标准模板
+                    <Download className="w-4 h-4" />
+                </button>
+             </div>
         </div>
 
-        <h3 className="text-lg md:text-xl font-semibold text-slate-800 mb-2 text-center">
-          {loading ? '正在加载...' : '点击选择题库文件'}
-        </h3>
-        <p className="text-slate-400 text-xs md:text-sm mb-6 text-center">
-          支持导入您之前保存的 .json 文件
-        </p>
-
-        <button className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-bold shadow-lg shadow-indigo-200 pointer-events-none">
-          浏览文件
-        </button>
-      </div>
-
-      {error && (
-        <div className="mt-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-start gap-3 max-w-xl w-full animate-bounce-in">
-          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          <p className="text-sm">{error}</p>
+        {/* Right Column: Presets */}
+        <div className="flex flex-col gap-4 h-full">
+            <h2 className="text-lg font-bold text-slate-700 flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-indigo-500" />
+                内置题库 ({presets.length})
+            </h2>
+            <div className="flex-1 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col max-h-[500px]">
+                <div className="overflow-y-auto p-2 space-y-2 flex-1 custom-scrollbar">
+                    {presets.length > 0 ? presets.map((preset) => (
+                        <button
+                            key={preset.id}
+                            onClick={() => handlePresetClick(preset)}
+                            className="w-full text-left p-4 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all group flex items-center justify-between"
+                        >
+                            <div className="flex-1 min-w-0 mr-4">
+                                <h3 className="font-bold text-slate-700 truncate group-hover:text-indigo-700 transition-colors">
+                                    {preset.title}
+                                </h3>
+                                <p className="text-xs text-slate-400 mt-1 line-clamp-1">
+                                    {preset.description}
+                                </p>
+                                <div className="flex items-center gap-2 mt-2">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700">
+                                        {preset.count} 题
+                                    </span>
+                                    <span className="text-[10px] text-slate-300 font-mono hidden md:inline">
+                                        {preset.filename}
+                                    </span>
+                                </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
+                        </button>
+                    )) : (
+                        <div className="flex flex-col items-center justify-center h-48 text-center p-8">
+                            <BookOpen className="w-12 h-12 text-slate-200 mb-3" />
+                            <p className="text-slate-400 text-sm mb-4">
+                                正在扫描本地题库... <br/>
+                                <span className="text-xs opacity-70 block mt-1">(请确保 pmp_*.json 文件位于项目根目录)</span>
+                            </p>
+                             <button 
+                                onClick={loadExampleQuiz}
+                                className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors text-sm font-bold"
+                            >
+                                <PlayCircle className="w-4 h-4" />
+                                试用演示题库
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
-      )}
-
-      <div className="mt-auto md:mt-12 py-6">
-         <button 
-          onClick={downloadTemplate}
-          className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors px-4 py-2 rounded-lg"
-         >
-           <FileJson className="w-4 h-4" />
-           <span className="text-xs font-medium">下载示例模板</span>
-           <Download className="w-4 h-4" />
-         </button>
       </div>
     </div>
   );
