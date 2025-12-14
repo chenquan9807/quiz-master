@@ -112,7 +112,7 @@
       "type": "single",
       "question": "希望项目能在很短的时间内给出成本的估算，会采取以下哪种方法?",
       "options": ["确定性估算", "自下而上估算", "参数估算", "量级估算"],
-      "answer": 2
+      "answer": 3
     },
     {
       "id": "17",
@@ -196,7 +196,7 @@
       "type": "single",
       "question": "绩效测量基准是__。",
       "options": ["BAC", "EV", "AC", "BCWS (PV)"],
-      "answer": 3
+      "answer": 0
     },
     {
       "id": "29",
